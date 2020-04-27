@@ -37,7 +37,18 @@
 4. 解压的时候，需要使用管理员权限，在搜索框中搜索winRAR，右击，管理员身份启动。
 
 5. 关注三个文件夹：
-    1. bin下面的hadoop,最好配置成环境变量的路径。
+    1. bin下面的hadoop,最好配置成永久环境变量的路径。
+        ```
+            $ chmod 777 profile
+            $ vi /etc/profile
+        ```
+        加入下面两句话：
+        ```
+            export HADOOP_HOME=/mnt/d/hadoop-3.2.1
+
+            export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+        ```
+        然后保存。
     2. etc文件夹包含配置文件。
     3. share文件夹包含org.apache.hadoop的各种jar包。
 
