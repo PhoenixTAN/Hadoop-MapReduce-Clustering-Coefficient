@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/common/hadoop-common-3.2.1.jar" sourcepath="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/common/hadoop-common-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/common/hadoop-common-3.2.1-tests.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/common/hadoop-kms-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/common/hadoop-nfs-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-app-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-common-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-core-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-plugins-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-3.2.1-tests.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-nativetask-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-shuffle-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-client-uploader-3.2.1.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop-3.2.1/hadoop-3.2.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.2.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

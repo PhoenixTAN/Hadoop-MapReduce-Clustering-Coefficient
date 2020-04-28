@@ -179,7 +179,6 @@ public class NaiveTriangleCounter {
 				context.write(vertexKey, new LongWritable(num));
 			}
 		}
-		
 	}
 	
 	/**
