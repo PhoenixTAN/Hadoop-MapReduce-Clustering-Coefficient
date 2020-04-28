@@ -13,6 +13,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+
+
 public class TriangleCounterImproved {
 
 	/**
@@ -33,7 +35,7 @@ public class TriangleCounterImproved {
 			/**
 			 * value: input graph as a string
 			 */
-			// System.out.println("Mapper1: ================================");
+
 			StringTokenizer edgeIterator = new StringTokenizer(value.toString());
 			while (edgeIterator.hasMoreTokens()) {
 				vertex.set(Long.parseLong(edgeIterator.nextToken()));
@@ -55,7 +57,6 @@ public class TriangleCounterImproved {
 
 		public void reduce(LongWritable key, Iterable<LongWritable> values, Context context)
 				throws IOException, InterruptedException {
-			// System.out.println("Reducer1: ================================");
 			int size = 0; // number of neighbors
 
 			long[] neighbors = new long[4096]; // we need to perform a nested loop on the iterable values
@@ -125,7 +126,7 @@ public class TriangleCounterImproved {
 			}
 
 			node1.set(key.toString() + "," + Integer.toString(size));
-			///////////////
+
 			long id1 = Long.parseLong(key.toString());
 			for (int i = 0; i < size; i++) {
 				// node2.set(neighbors[i]);
@@ -153,7 +154,6 @@ public class TriangleCounterImproved {
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 			StringTokenizer edgeIterator = new StringTokenizer(value.toString());
 			while (edgeIterator.hasMoreTokens()) {
-				// String token1 = edgeIterator.nextToken().toString();
 				String[] node1 = edgeIterator.nextToken().toString().split(",");
 				long id1 = Long.parseLong(node1[0]);
 				long degree1 = Long.parseLong(node1[1]);
@@ -199,19 +199,12 @@ public class TriangleCounterImproved {
 
 				neighbors[size++] = neighbor;
 
-				// emit actual edges
-				/*
-				 * String actualEdge = key.toString() + "," + Long.toString(neighbor);
-				 * pair.set(actualEdge); context.write(pair, new Text("$"));
-				 */
 			}
 
-			// emit possible triangles
 			for (int i = 0; i < size; i++) {
 				for (int j = i + 1; j < size; j++) {
 					String possibleEdge = Long.toString(neighbors[i]) + "," + Long.toString(neighbors[j]);
 					pair.set(possibleEdge);
-					// context.write(pair, new Text(key.toString()));
 					context.write(new Text(key.toString()), pair);
 				}
 			}
@@ -221,50 +214,24 @@ public class TriangleCounterImproved {
 	/**
 	 * Mapper4: Produce actual triangles.
 	 */
-
 	public static class TriangleMapper extends Mapper<LongWritable, Text, Text, Text> {
 
 		private Text pairKey = new Text();
 		private Text outValue = new Text();
 
-		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException { //
-			// System.out.println("Mapper2: ================================");
-			// StringTokenizer lines = new StringTokenizer(value.toString());
-			/*while (lines.hasMoreTokens()) {
-				String pair = lines.nextToken().toString();
-				if (!lines.hasMoreTokens()) {
-					throw new RuntimeException("Invalid line in TriangleProducer.");
-				}
-				String symbol = lines.nextToken().toString();
+		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException { //			
 
-				if (symbol.contentEquals("$")) { // System.out.println("Adding edge ...");
-					pairKey.set(pair);
-					outValue.set(symbol);
-					context.write(pairKey, outValue);
-				} else { // System.out.println("Possible edge ..."); pairKey.set(pair);
-					outValue.set(symbol);
-					context.write(pairKey, outValue);
-				}
-			}*/
-			
-			// input type 1
-			/*
-				0	1,2
-				1	2,3
-				4	5,3
-			*/
-			// input type 2
-			/*
-			 *  0	1
-			 *  1   0
-			 */
-			
 			String data = value.toString();
 			String[] lines = data.split("\n");
 			for( String line : lines ) {
 				int index = line.indexOf(',');
 				if( index != -1 ) {
-					// input type 1
+					// input type 1 --- vertex  pair of its neighbor
+					/*	example: 
+						0	1,2
+						1	2,3
+						4	5,3
+					 */
 					String[] vPair = line.split("\t");
 					String v = vPair[0];
 					String pair = vPair[1];
@@ -274,7 +241,11 @@ public class TriangleCounterImproved {
 					context.write(pairKey, outValue);
 				}
 				else {
-					// input type 2
+					// input type 2 --- origianal edge list
+					/*
+					 *  0	1
+					 *  1   0
+					 */	
 					String[] edge = line.split("\t");
 					String v1 = edge[0];
 					String v2 = edge[1];
@@ -295,26 +266,24 @@ public class TriangleCounterImproved {
 		 */
 
 	public static class TriangleReducer extends Reducer<Text, Text, LongWritable, LongWritable> {
-
+		private LongWritable one = new LongWritable(1);
+		
 		public void reduce(Text key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
-
-			// System.out.println("Reducer2: ================================"); //
-			System.out.println("Key: " + key.toString());
+			
 			long[] triangles = new long[4096];
 			int size = 0;
 			boolean isActualEdge = false;
-			for (Text symbol : values) { // System.out.println("Symbol: " + symbol.toString() );
+			for (Text symbol : values) { 
 				if (symbol.toString().contentEquals("$")) {
-					isActualEdge = true; //
-					// System.out.println("Actual Edge");
+					isActualEdge = true; 
 					continue;
 				}
 
 				long id = Long.parseLong(symbol.toString());
 
-				if (triangles.length == size) { // expand the capacity
-					triangles = Arrays.copyOf(triangles, (int) (size * 1.5));
+				if (triangles.length == size) { 
+					triangles = Arrays.copyOf(triangles, (int) (size * 1.5));	// expand the capacity
 				}
 
 				triangles[size++] = id;
@@ -322,55 +291,54 @@ public class TriangleCounterImproved {
 
 			if (isActualEdge) {
 				for (int i = 0; i < size; i++) { 
-					context.write(new LongWritable(triangles[i]), new LongWritable(1));
+					// the vertex of lowest degree in an triangle should be 
+					// responsible for making sure the triangle get counted
+					context.write(new LongWritable(triangles[i]), one);
 				}
 			}
 		}
 	}
 
 	 /**
-		 * Mapper5: Produce actual triangles.
-		 */
+	 * Mapper5: triangle count
+	 */	  
+	public static class TriangleGetter extends Mapper<LongWritable, Text, LongWritable, LongWritable> {
 
-	/*
-	 * 
-	 * 
-	 * public static class TriangleGetter extends Mapper<LongWritable, Text,
-	 * LongWritable, LongWritable> {
-	 * 
-	 * private LongWritable vertexKey = new LongWritable();
-	 * 
-	 * public void map(LongWritable key, Text value, Context context) throws
-	 * IOException, InterruptedException { //
-	 * System.out.println("Mapper3=====================================");
-	 * StringTokenizer vertexIterator = new StringTokenizer(value.toString()); while
-	 * ( vertexIterator.hasMoreTokens() ) { long vertex =
-	 * Long.parseLong(vertexIterator.nextToken()); vertexKey.set(vertex); if
-	 * (!vertexIterator.hasMoreTokens()) { throw new
-	 * RuntimeException("Invalid edge in EdgeReader."); } long num =
-	 * Long.parseLong(vertexIterator.nextToken()); //
-	 * System.out.println("vertexKey: " + vertex); context.write(vertexKey, new
-	 * LongWritable(num)); } } }
-	 * 
-	 */
+		private LongWritable vertexKey = new LongWritable();
+		private LongWritable one = new LongWritable(1);
+		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException { 
+			
+			StringTokenizer vertexIterator = new StringTokenizer(value.toString());
+			while (vertexIterator.hasMoreTokens()) {
+				long vertex = Long.parseLong(vertexIterator.nextToken());
+				vertexKey.set(vertex);
+				if (!vertexIterator.hasMoreTokens()) {
+					throw new RuntimeException("Invalid edge in EdgeReader.");
+				}
+				long num = Long.parseLong(vertexIterator.nextToken());
+				context.write(one, new LongWritable(num));
+			}
+		}
+	}
+	  
+	 
 	/**
-	* Reducer5: Triangle counter.
+	* Reducer5: sum up.
 	*/
-	/*
 	public static class TriangleCounter extends Reducer<LongWritable, LongWritable, LongWritable, LongWritable> {
 
 		public void reduce(LongWritable key, Iterable<LongWritable> values, Context context)
-				throws IOException, InterruptedException { //
-			System.out.println("Counter==========================");
+				throws IOException, InterruptedException { 
+			
 			long count = 0;
 			for (LongWritable val : values) {
 				count += val.get();
-			} //
-			System.out.println("key: " + key.get() + "  count: " + count);
+			} 
+			
 			context.write(new LongWritable(key.get()), new LongWritable(count));
 		}
 	}
-	 */
+	 
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 		// pass parameter in the console
@@ -474,8 +442,7 @@ public class TriangleCounterImproved {
 		FileInputFormat.addInputPath(job3, new Path(OUTPUT_PREFIX + reducer2output));
 		FileOutputFormat.setOutputPath(job3, new Path(OUTPUT_PREFIX + reducer3output));
 
-		
-		  // Job 4 
+		// Job 4 
 		Job job4 = Job.getInstance(conf, "Triangle Count4");
 		job4.setJarByClass(TriangleCounterImproved.class);
 		job4.setMapperClass(TriangleMapper.class);
@@ -487,26 +454,23 @@ public class TriangleCounterImproved {
 		job4.setOutputKeyClass(LongWritable.class);
 		job4.setOutputValueClass(LongWritable.class);
 
-		// FileInputFormat.addInputPath(job4, new Path(OUTPUT_PREFIX +reducer3output));
-		// FileInputFormat.setInputPaths(job4, new Path(OUTPUT_PREFIX + reducer3output + "," + DATADIR_PREFIX + dataSetDir));
 		FileInputFormat.setInputPaths(job4, new String(OUTPUT_PREFIX + reducer3output + "," + DATADIR_PREFIX + dataSetDir));
 		FileOutputFormat.setOutputPath(job4, new Path(OUTPUT_PREFIX + reducer4output));
-		  /*
-		  // Job 5 Job job5 = Job.getInstance(conf, "Triangle Count5");
-		  job5.setJarByClass(TriangleCounterImproved.class);
-		  job5.setMapperClass(TriangleGetter.class);
-		  job5.setReducerClass(TriangleCounter.class);
-		  
-		  job5.setMapOutputKeyClass(LongWritable.class);
-		  job5.setMapOutputValueClass(LongWritable.class);
-		  
-		  job5.setOutputKeyClass(LongWritable.class);
-		  job5.setOutputValueClass(LongWritable.class);
-		  
-		  FileInputFormat.addInputPath(job5, new Path(OUTPUT_PREFIX + reducer4output));
-		  FileOutputFormat.setOutputPath(job5, new Path(OUTPUT_PREFIX +
-		  reducer5output));
-		 */
+
+		// Job 5
+		Job job5 = Job.getInstance(conf, "Triangle Count5");
+		job5.setJarByClass(TriangleCounterImproved.class);
+		job5.setMapperClass(TriangleGetter.class);
+		job5.setReducerClass(TriangleCounter.class);
+
+		job5.setMapOutputKeyClass(LongWritable.class);
+		job5.setMapOutputValueClass(LongWritable.class);
+
+		job5.setOutputKeyClass(LongWritable.class);
+		job5.setOutputValueClass(LongWritable.class);
+
+		FileInputFormat.addInputPath(job5, new Path(OUTPUT_PREFIX + reducer4output));
+		FileOutputFormat.setOutputPath(job5, new Path(OUTPUT_PREFIX + reducer5output));
 
 		int ret = job1.waitForCompletion(true) ? 0 : 1;
 
@@ -518,11 +482,13 @@ public class TriangleCounterImproved {
 			ret = job3.waitForCompletion(true) ? 0 : 1;
 		}
 
+		if (ret == 0) { 
+			ret = job4.waitForCompletion(true) ? 0 : 1; 
+		}
 		
-		if (ret == 0) { ret = job4.waitForCompletion(true) ? 0 : 1; }
-		  
-		  // if (ret == 0) { ret = job5.waitForCompletion(true) ? 0 : 1; }
-		 
+		if (ret == 0) { 
+			ret = job5.waitForCompletion(true) ? 0 : 1; 
+		}
 
 		System.exit(ret);
 
