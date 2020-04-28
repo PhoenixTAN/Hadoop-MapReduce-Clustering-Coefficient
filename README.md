@@ -104,7 +104,8 @@ Every line represents an edge between two vertices.
  *  Data Proprocess: 
  *  We could use two mapReduce rounds to generate the degree of every vertex and add them to the raw data. 
  *  In this process, we also eliminate the duplicate edges. 
- *  For example, edge(v1,v2) and edge(v2,v1) are duplicate and we only retain edge(v1,v2) where the vertex with smaller id will put in the first place of the tuple.
+ *  For example, edge(v1,v2) and edge(v2,v1) are duplicate and we only retain edge(v1,v2) 
+ *  where the vertex with smaller id will put in the first place of the tuple.
  *  The output of Reducer2 will be lines of ("v1,d1" "v2,d2").
  */
 
